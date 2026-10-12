@@ -31,8 +31,20 @@ depending on which signal path produced the signal. The response was
 `src/core/stage_gate_validator.py`, which parses the source with `ast` and refuses to
 let a stage complete if a layer imports something it should not.
 
-That validator is the most interesting file here, and the reason the rest of the
-codebase can be trusted to be as separated as it claims.
+That validator is the most interesting file here, and the clearest expression of the
+problem it was built for.
+
+**What it actually enforces, precisely:** the cross-layer import ban
+(`src.execution`, `src.strategies`, `src.risk`, `src.brokers`, `src.orchestration`,
+`src.runtime`) is applied to **four files** — the ones under `src/portfolio/`, which was
+the layer under construction at Stage 14.3. It is not a codebase-wide proof of
+separation, and the codebase does not currently satisfy one: `src/risk/risk_engine.py:4`
+imports `src.execution.simulator`, which the validator would flag if it scanned that file.
+
+The separation that does hold is enforced by pinned docstrings and import contracts
+(`ExecutionRouter` — *"Never modifies any backend"*; `StageGateValidator` — *"NO trading /
+execution / strategy / risk / broker dependencies"*) rather than mechanically. Extending
+the gate from four files to all of `src/` is the obvious next step, and is not done.
 
 ## Architecture
 
@@ -48,6 +60,11 @@ codebase can be trusted to be as separated as it claims.
 | portfolio | `src/portfolio/` | Reconciles internal state against Alpaca. **Alpaca is truth.** |
 | core | `src/core/` | `StageGateValidator` — the architectural gate. |
 
+Supporting packages, not in the signal path: `contracts/` (Order, Position, Signal,
+`validate_bar`), `data/` (`BarCache`, Alpaca historical connector, `RealtimeFeed`
+interface), `replay/` (`ReplayEngine`), `orchestration/` (`BacktestRunner`),
+`evaluation/` (`SignalEvaluator`), `observability/` (`ReplayLogger`).
+
 ### Two rules enforced mechanically
 
 **1. Feature identity stability.** Any change to a feature's computation requires a
@@ -62,9 +79,9 @@ StageGateValidator.run(stage="14.3")
 ```
 
 It runs `ast.parse` over `src/`, imports the public API to confirm it exists, checks
-ten required exports, and then hunts for drift: forbidden symbols, cross-layer
-imports under `src.execution`, `src.strategies`, `src.risk`, `src.brokers`,
-`src.orchestration`, `src.runtime`, and renamed public functions.
+ten required exports, and then hunts for drift: forbidden symbols, cross-layer imports
+under `src.execution`, `src.strategies`, `src.risk`, `src.brokers`,
+`src.orchestration`, `src.runtime`, and a rename of the `reconcile` function.
 
 ### Reconciliation: Alpaca is truth
 
