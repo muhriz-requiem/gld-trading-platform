@@ -1,0 +1,53 @@
+# --- Secrets ---
+# The original .env held live Alpaca paper + live keys and was committed in 7b2e49c
+# before being removed in 37a8de5. All such keys have been rotated. The published
+# history is a single squashed commit that never contained .env.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+.netrc
+credentials*
+*secrets*.json
+
+# --- Environments ---
+.venv/
+venv/
+env/
+
+# --- Python artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- Runtime state (empty dir, populated by the bar cache) ---
+runtime/
+*.log
+
+# --- Editors / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- One-off developer scratch scripts ---
+_sc.py
+_sc2.py
+_sc3.py
+_sc4.py
+_fix.py
+_syntax_check.py
+_write_*.py

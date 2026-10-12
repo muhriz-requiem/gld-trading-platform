@@ -1,0 +1,22 @@
+# Runtime dependencies for GLD Trading Platform.
+#
+# Recovered from .venv; this project never shipped a requirements file.
+#
+# Requires Python 3.10+ (PEP 604 `X | None` / PEP 585 builtin generics are used
+# throughout src/).
+
+# --- broker ---
+alpaca-py>=0.43
+
+# --- data / numerics ---
+pandas
+numpy
+pydantic>=2
+
+# --- config / http ---
+python-dotenv
+requests
+
+# --- typing + tz ---
+typing-extensions
+tzdata

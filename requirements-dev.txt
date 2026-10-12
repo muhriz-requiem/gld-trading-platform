@@ -1,0 +1,6 @@
+# Test dependencies for GLD Trading Platform.
+-r requirements.txt
+
+pytest>=8
+pytest-cov
+ruff
